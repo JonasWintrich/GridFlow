@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap');
+
+:root {
+  --ink: #f4f6ff;
+  --dim: rgba(228, 233, 255, 0.62);
+  --cyan: #22d3ee;
+  --violet: #8b5cf6;
+  --magenta: #e879f9;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: #03030a;
+  color: var(--ink);
+  font-family: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Fixed full-screen canvas — the universe lives behind everything */
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  z-index: 0;
+}
+
+/* Vignette to seat the particles in deep space */
+#vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(130% 100% at 50% 38%, transparent 38%, rgba(3, 3, 10, 0.5) 78%, rgba(3, 3, 10, 0.92) 100%);
+}
+
+/* Filmic grain */
+#grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 6s steps(6) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); } 20% { transform: translate(-4%, 3%); }
+  40% { transform: translate(3%, -5%); } 60% { transform: translate(-3%, 4%); }
+  80% { transform: translate(4%, -3%); } 100% { transform: translate(0, 0); }
+}
+
+/* Scroll container */
+#scroll { position: relative; z-index: 3; }
+.panel {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 8vw;
+  pointer-events: none;
+}
+.panel.right { align-items: flex-end; text-align: right; }
+.panel.center { align-items: center; text-align: center; }
+.panel.left { align-items: flex-start; text-align: left; }
+
+.reveal {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.kicker {
+  font-size: clamp(11px, 1vw, 13px);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 1.2rem;
+  font-weight: 500;
+}
+h1 {
+  font-size: clamp(56px, 12vw, 168px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  background: linear-gradient(110deg, #ffffff 8%, var(--cyan) 42%, var(--violet) 70%, var(--magenta) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 38px rgba(80, 120, 255, 0.28));
+}
+h2 {
+  font-size: clamp(34px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  max-width: 15ch;
+}
+.lead {
+  margin-top: 1.5rem;
+  font-size: clamp(15px, 1.5vw, 21px);
+  line-height: 1.55;
+  color: var(--dim);
+  max-width: 46ch;
+  font-weight: 300;
+}
+.panel.right .lead { margin-left: auto; }
+.panel.center .lead { margin-left: auto; margin-right: auto; }
+.panel.center h2 { margin-left: auto; margin-right: auto; }
+
+.cta {
+  pointer-events: auto;
+  margin-top: 2.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1.05rem 2.3rem;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #04040c;
+  background: linear-gradient(100deg, var(--cyan), var(--violet));
+  text-decoration: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 18px 50px -12px rgba(96, 120, 255, 0.6);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s;
+}
+.cta:hover {
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22), 0 26px 70px -10px rgba(120, 140, 255, 0.8);
+}
+.cta svg { width: 16px; height: 16px; }
+
+/* Top bar */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.6rem 8vw;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+#topbar .brand { font-weight: 700; letter-spacing: 0.34em; font-size: 13px; }
+#topbar .meta { font-size: 11px; letter-spacing: 0.28em; color: var(--dim); }
+
+/* Scroll progress rail */
+#rail {
+  position: fixed; right: max(2.4vw, 18px); top: 50%; transform: translateY(-50%);
+  z-index: 5; display: flex; flex-direction: column; gap: 14px; align-items: center;
+  pointer-events: none;
+}
+#rail .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(180, 196, 255, 0.25);
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#rail .dot.on { background: var(--cyan); box-shadow: 0 0 14px var(--cyan); transform: scale(1.5); }
+
+/* Scroll hint */
+#hint {
+  position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%);
+  z-index: 5; font-size: 10.5px; letter-spacing: 0.34em; text-transform: uppercase;
+  color: var(--dim); display: flex; flex-direction: column; align-items: center; gap: 10px;
+  pointer-events: none; transition: opacity 0.6s;
+}
+#hint .line {
+  width: 1px; height: 36px;
+  background: linear-gradient(var(--cyan), transparent);
+  animation: drop 1.8s ease-in-out infinite;
+}
+@keyframes drop {
+  0% { opacity: 0.2; transform: scaleY(0.4); transform-origin: top; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; transform: scaleY(0.4); transform-origin: top; }
+}
+
+/* Credit */
+#credit {
+  position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
+  z-index: 4; font-size: 10px; letter-spacing: 0.06em;
+  color: rgba(228, 233, 255, 0.28); text-align: center; pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Loading veil */
+#loader {
+  position: fixed; inset: 0; z-index: 20; background: #03030a;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px;
+  transition: opacity 1s ease;
+}
+#loader.gone { opacity: 0; pointer-events: none; }
+#loader .ring {
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 2px solid rgba(180, 196, 255, 0.18); border-top-color: var(--cyan);
+  animation: spin 0.9s linear infinite;
+}
+#loader .txt { font-size: 11px; letter-spacing: 0.34em; color: var(--dim); text-transform: uppercase; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .panel { padding: 0 7vw; }
+  #topbar { padding: 1.2rem 7vw; }
+  .lead { max-width: 88vw; }
+  #rail { display: none; }
+  #credit { font-size: 9px; white-space: normal; width: 90vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #grain, #hint .line { animation: none; }
+  html { scroll-behavior: auto; }
+}
