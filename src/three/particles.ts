@@ -10,20 +10,14 @@ export interface ParticleSystem {
     uSize: { value: number };
     uPixelRatio: { value: number };
     uScatter: { value: number };
+    uDrift: { value: number };
   };
   setTargets: (from: Float32Array, to: Float32Array) => void;
   dispose: () => void;
 }
 
-// Deep-space palette: cyan -> violet -> magenta, with rare warm-white core stars.
-const PALETTE = [
-  new THREE.Color('#22d3ee'),
-  new THREE.Color('#38bdf8'),
-  new THREE.Color('#8b5cf6'),
-  new THREE.Color('#a855f7'),
-  new THREE.Color('#e879f9'),
-  new THREE.Color('#f0abfc'),
-];
+// Default deep-space palette: cyan -> violet -> magenta, with rare warm-white cores.
+const DEFAULT_PALETTE = ['#22d3ee', '#38bdf8', '#8b5cf6', '#a855f7', '#e879f9', '#f0abfc'];
 
 const vertexShader = /* glsl */ `
 uniform float uTime;
@@ -32,6 +26,7 @@ uniform vec3  uMouse;
 uniform float uSize;
 uniform float uPixelRatio;
 uniform float uScatter;
+uniform float uDrift;
 
 attribute vec3  aTargetFrom;
 attribute vec3  aTargetTo;
@@ -53,7 +48,7 @@ void main() {
   float nx = snoise(q + vec3(0.0,  0.0,  t));
   float ny = snoise(q + vec3(31.4, 12.7, t));
   float nz = snoise(q + vec3(7.2,  91.3, t));
-  pos += vec3(nx, ny, nz) * 1.7;
+  pos += vec3(nx, ny, nz) * uDrift;
 
   // A subtle global "scatter" used at the very end of the journey.
   pos += aScatterDir * uScatter;
@@ -89,7 +84,12 @@ void main() {
 }
 `;
 
-export function createParticles(count: number, initial: Float32Array): ParticleSystem {
+export function createParticles(
+  count: number,
+  initial: Float32Array,
+  palette: string[] = DEFAULT_PALETTE,
+): ParticleSystem {
+  const PALETTE = palette.map((hex) => new THREE.Color(hex));
   const geometry = new THREE.BufferGeometry();
 
   const aTargetFrom = new THREE.BufferAttribute(initial.slice(), 3);
@@ -137,6 +137,7 @@ export function createParticles(count: number, initial: Float32Array): ParticleS
     uSize: { value: 3.2 },
     uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
     uScatter: { value: 0 },
+    uDrift: { value: 1.7 },
   };
 
   const material = new THREE.ShaderMaterial({

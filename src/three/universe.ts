@@ -5,7 +5,8 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 
 import { createParticles } from './particles';
-import { galaxy, sphere, helix, starfield, textToPoints, modelToPoints } from './shapes';
+import { galaxy, sphere, helix, starfield, textToPoints, modelToPoints, rotatePoints } from './shapes';
+import type { Demo } from '../product.config';
 
 export interface UniverseHandle {
   dispose: () => void;
@@ -14,7 +15,8 @@ export interface UniverseHandle {
 interface Options {
   onReady?: () => void;
   onProgress?: (progress: number, index: number) => void;
-  modelUrl?: string;
+  /** The active hero preset — panels, accent, and (optional) product model. */
+  demo: Pick<Demo, 'panels' | 'accent' | 'modelUrl' | 'modelSize'>;
 }
 
 const smootherstep = (x: number) => {
@@ -23,7 +25,7 @@ const smootherstep = (x: number) => {
 };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-export function createUniverse(canvas: HTMLCanvasElement, opts: Options = {}): UniverseHandle {
+export function createUniverse(canvas: HTMLCanvasElement, opts: Options): UniverseHandle {
   const isMobile = window.matchMedia('(max-width: 760px)').matches;
   const COUNT = isMobile ? 45000 : 120000;
   const noBloom = new URLSearchParams(window.location.search).has('nobloom');
@@ -43,24 +45,44 @@ export function createUniverse(canvas: HTMLCanvasElement, opts: Options = {}): U
   const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(0, 0, 78);
 
-  // --- shapes (procedural ready immediately; model swapped in once loaded) ---
-  const shapes: Float32Array[] = [
-    galaxy(COUNT),          // 0
-    textToPoints('FLOWLY', COUNT, 30), // 1
-    sphere(COUNT, 24),      // 2
-    sphere(COUNT, 22),      // 3 -> replaced by model
-    helix(COUNT),           // 4
-    starfield(COUNT, 95),   // 5
-  ];
-  const N = shapes.length;
+  // --- shapes built from the product config (procedural forms ready instantly;
+  //     model views start as a placeholder sphere and stream in once loaded) ---
+  const panels = opts.demo.panels;
+  const N = panels.length;
+  const modelSlots: { index: number; euler: THREE.Euler }[] = [];
 
-  // Per-shape camera framing.
-  const camZ = [82, 60, 58, 64, 74, 94];
-  const tiltX = [0.85, 0.0, 0.22, 0.0, 0.0, 0.35];
+  const shapes: Float32Array[] = panels.map((p, i) => {
+    switch (p.view.kind) {
+      case 'brandText':
+        return textToPoints(p.view.text, COUNT, 30);
+      case 'sphere':
+        return sphere(COUNT, p.view.radius ?? 24);
+      case 'galaxy':
+        return galaxy(COUNT);
+      case 'helix':
+        return helix(COUNT);
+      case 'starfield':
+        return starfield(COUNT, p.view.radius ?? 95);
+      case 'model':
+        modelSlots.push({ index: i, euler: new THREE.Euler(p.view.pitch ?? 0, p.view.yaw, 0) });
+        return sphere(COUNT, 22); // placeholder until the model loads
+    }
+  });
+  const modelIndices = new Set(modelSlots.map((s) => s.index));
+
+  // Per-shape camera framing, straight from the config.
+  const camZ = panels.map((p) => p.camZ);
+  const tiltX = panels.map((p) => p.tiltX);
+
+  // Brand accent expanded into a 6-stop particle palette.
+  const { a, b, c } = opts.demo.accent;
+  const mix = (h1: string, h2: string, t: number) =>
+    new THREE.Color(h1).lerp(new THREE.Color(h2), t).getStyle();
+  const palette = [a, mix(a, b, 0.5), b, mix(b, c, 0.5), c, mix(c, '#ffffff', 0.35)];
 
   const group = new THREE.Group();
   scene.add(group);
-  const particles = createParticles(COUNT, shapes[0]);
+  const particles = createParticles(COUNT, shapes[0], palette);
   particles.uniforms.uPixelRatio.value = dpr;
   group.add(particles.points);
 
@@ -89,9 +111,12 @@ export function createUniverse(canvas: HTMLCanvasElement, opts: Options = {}): U
   let lastSeg = -1;
 
   // --- handlers ---
+  // The morph is driven by scroll *within the particle hero act only* (the first
+  // N full-screen panels). Past the act, the cloud holds its final form while the
+  // conventional sales page scrolls over it.
   const onScroll = () => {
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = max > 0 ? window.scrollY / max : 0;
+    const actHeight = N * window.innerHeight - window.innerHeight; // scrollable range of the act
+    const progress = actHeight > 0 ? Math.min(1, Math.max(0, window.scrollY / actHeight)) : 0;
     targetIndex = progress * (N - 1);
     opts.onProgress?.(progress, Math.round(targetIndex));
   };
@@ -141,8 +166,13 @@ export function createUniverse(canvas: HTMLCanvasElement, opts: Options = {}): U
     particles.uniforms.uProgress.value = eased;
     particles.uniforms.uTime.value = t;
 
-    // final dispersal burst near the very end of the page
-    particles.uniforms.uScatter.value = smootherstep((currentIndex - (N - 1.6)) / 0.6) * 7;
+    // No final dispersal — a product page lands on the assembled product and holds it.
+
+    // Calm the curl-noise drift near product beats so the model's silhouette stays
+    // legible; let it breathe fully on the abstract forms (brand text, sphere).
+    const onModel = modelIndices.has(seg) || modelIndices.has(seg + 1);
+    const driftTarget = onModel ? 0.55 : 1.7;
+    particles.uniforms.uDrift.value += (driftTarget - particles.uniforms.uDrift.value) * Math.min(1, dt * 3);
 
     // camera framing interpolated along the journey
     const z = lerp(camZ[seg], camZ[seg + 1], eased);
@@ -178,18 +208,19 @@ export function createUniverse(canvas: HTMLCanvasElement, opts: Options = {}): U
   };
   tick();
 
-  // --- load the open-source model and swap it into slot 3 once it's ready ---
-  if (opts.modelUrl) {
-    modelToPoints(opts.modelUrl, COUNT, 44, new THREE.Euler(0, -0.6, 0))
-      .then((pts) => {
-        shapes[3] = pts;
-        // if the viewer is already at/near that segment, refresh the live buffers
-        if (lastSeg === 2 || lastSeg === 3) {
+  // --- load the product model ONCE, then fill every model view by rotating the
+  //     same sampled cloud (so each view morphs as a rigid turn, not a reshuffle) ---
+  if (opts.demo.modelUrl && modelSlots.length) {
+    modelToPoints(opts.demo.modelUrl, COUNT, opts.demo.modelSize)
+      .then((base) => {
+        for (const slot of modelSlots) shapes[slot.index] = rotatePoints(base, slot.euler);
+        // if the viewer is already sitting on a now-updated segment, refresh live buffers
+        if (lastSeg >= 0 && (modelIndices.has(lastSeg) || modelIndices.has(lastSeg + 1))) {
           particles.setTargets(shapes[lastSeg], shapes[lastSeg + 1]);
         }
       })
       .catch((err) => {
-        console.warn('[Flowly] model load failed, keeping procedural fallback:', err);
+        console.warn('[motewave] model load failed, keeping procedural fallback:', err);
       });
   }
 

@@ -126,6 +126,25 @@ export function textToPoints(text: string, count: number, worldHeight = 30): Flo
   return out;
 }
 
+/**
+ * Rotate a point cloud in place-correspondence — point `i` maps to the same
+ * surface point, just rotated. Sampling the model once and deriving each angled
+ * view this way keeps the 1:1 morph clean, so the cloud reads as a rigid rotation
+ * (the product physically turning) rather than a random re-shuffle.
+ */
+export function rotatePoints(src: Float32Array, euler: THREE.Euler): Float32Array {
+  const out = new Float32Array(src.length);
+  const m = new THREE.Matrix4().makeRotationFromEuler(euler);
+  const e = m.elements;
+  for (let i = 0; i < src.length; i += 3) {
+    const x = src[i], y = src[i + 1], z = src[i + 2];
+    out[i] = e[0] * x + e[4] * y + e[8] * z;
+    out[i + 1] = e[1] * x + e[5] * y + e[9] * z;
+    out[i + 2] = e[2] * x + e[6] * y + e[10] * z;
+  }
+  return out;
+}
+
 /** Sample the surface of a loaded glTF model into a point cloud of `count` points. */
 export async function modelToPoints(
   url: string,

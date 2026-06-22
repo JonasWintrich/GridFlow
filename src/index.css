@@ -130,6 +130,12 @@ h2 {
   transform: translateY(-3px) scale(1.015);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22), 0 26px 70px -10px rgba(120, 140, 255, 0.8);
 }
+.cta .price {
+  margin-left: 0.1rem;
+  padding-left: 0.7rem;
+  border-left: 1px solid rgba(4, 4, 12, 0.25);
+  font-weight: 700;
+}
 .cta svg { width: 16px; height: 16px; }
 
 /* Top bar */
@@ -141,7 +147,15 @@ h2 {
   mix-blend-mode: screen;
 }
 #topbar .brand { font-weight: 700; letter-spacing: 0.34em; font-size: 13px; }
-#topbar .meta { font-size: 11px; letter-spacing: 0.28em; color: var(--dim); }
+#topbar .buy {
+  pointer-events: auto;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); text-decoration: none;
+  padding: 0.6rem 1.2rem; border-radius: 999px;
+  border: 1px solid rgba(244, 246, 255, 0.4);
+  transition: border-color 0.3s, color 0.3s, transform 0.3s;
+}
+#topbar .buy:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-1px); }
 
 /* Scroll progress rail */
 #rail {
@@ -174,12 +188,12 @@ h2 {
   100% { opacity: 0.2; transform: scaleY(0.4); transform-origin: top; }
 }
 
-/* Credit */
+/* Credit (now an in-flow footer at the very bottom of the sales page) */
 #credit {
-  position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
-  z-index: 4; font-size: 10px; letter-spacing: 0.06em;
-  color: rgba(228, 233, 255, 0.28); text-align: center; pointer-events: none;
-  white-space: nowrap;
+  padding: 3rem 8vw 2.4rem;
+  font-size: 11px; letter-spacing: 0.1em;
+  color: rgba(228, 233, 255, 0.34); text-align: center;
+  border-top: 1px solid rgba(180, 196, 255, 0.08);
 }
 
 /* Loading veil */
@@ -208,4 +222,188 @@ h2 {
 @media (prefers-reduced-motion: reduce) {
   #grain, #hint .line { animation: none; }
   html { scroll-behavior: auto; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Zone B — the conventional sales page. Opaque dark background scrolls up over
+   the fixed particle canvas; keeps the deep-space palette but fully legible.
+   ───────────────────────────────────────────────────────────────────────── */
+#sales {
+  position: relative;
+  z-index: 4;
+  background: linear-gradient(180deg, rgba(3, 3, 10, 0) 0%, #04040d 6%, #04040d 100%);
+}
+.market {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 7rem 8vw;
+}
+.market .kicker { margin-bottom: 1.1rem; }
+.market h2 {
+  font-size: clamp(30px, 5vw, 60px);
+  font-weight: 700; line-height: 1.02; letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+.market.pitch { padding-top: 9rem; text-align: center; }
+.market.pitch h2, .market.pitch .lead { margin-left: auto; margin-right: auto; }
+.market .lead { margin-top: 1.4rem; }
+.market h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 0.6rem; }
+.market h3 + p { color: var(--dim); font-weight: 300; line-height: 1.55; font-size: 15px; }
+
+/* What you get */
+.features-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem;
+}
+.feature {
+  padding: 2rem; border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(180, 196, 255, 0.09);
+}
+
+/* How it works */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; margin-top: 1rem; }
+.step-n {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.2em;
+  color: var(--cyan); margin-bottom: 1rem;
+}
+.step p { color: var(--dim); font-weight: 300; line-height: 1.55; font-size: 15px; }
+
+/* Pricing */
+.pricing {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; margin-top: 2.4rem;
+  align-items: start;
+}
+.tier {
+  position: relative;
+  padding: 2.2rem 1.9rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(180, 196, 255, 0.1);
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.tier.featured {
+  border-color: color-mix(in srgb, var(--violet) 70%, transparent);
+  background: rgba(139, 92, 246, 0.06);
+  box-shadow: 0 24px 70px -28px color-mix(in srgb, var(--violet) 80%, transparent);
+}
+.tier .badge {
+  position: absolute; top: -11px; left: 1.9rem;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: #04040c; padding: 0.32rem 0.7rem; border-radius: 999px;
+  background: linear-gradient(100deg, var(--cyan), var(--violet));
+}
+.tier-name { font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--dim); }
+.tier-price { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+.tier-send {
+  display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;
+  margin: 0.4rem 0 0.2rem;
+  font-size: 14px; font-weight: 500; color: var(--ink);
+}
+.tier-send span {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--cyan);
+  padding: 0.22rem 0.5rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--cyan) 14%, transparent);
+}
+.tier-blurb { color: var(--dim); font-weight: 300; line-height: 1.5; font-size: 14.5px; min-height: 3em; }
+.tier ul { list-style: none; margin: 0.6rem 0 1.6rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.tier li {
+  font-size: 14.5px; color: var(--ink); padding-left: 1.5rem; position: relative; font-weight: 300;
+}
+.tier li::before {
+  content: ''; position: absolute; left: 0; top: 0.5em;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+}
+.buy-btn {
+  margin-top: auto;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  padding: 0.95rem 1.4rem; border-radius: 999px;
+  font-size: 14.5px; font-weight: 600; text-decoration: none; color: var(--ink);
+  border: 1px solid rgba(244, 246, 255, 0.22);
+  transition: transform 0.3s, border-color 0.3s, background 0.3s, color 0.3s;
+}
+.buy-btn svg { width: 15px; height: 15px; }
+.buy-btn:hover { transform: translateY(-2px); border-color: var(--cyan); }
+.tier.featured .buy-btn {
+  background: linear-gradient(100deg, var(--cyan), var(--violet));
+  color: #04040c; border-color: transparent;
+  box-shadow: 0 16px 44px -14px color-mix(in srgb, var(--violet) 90%, transparent);
+}
+
+/* Optional hosting upsell — intentionally understated vs. the tiers (code handoff
+   is the recommended default; this is a quiet add-on). */
+.addon {
+  margin-top: 1.4rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+  padding: 1.6rem 1.9rem; border-radius: 16px; flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.018);
+  border: 1px dashed rgba(180, 196, 255, 0.16);
+}
+.addon-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 0.6rem;
+}
+.addon-head { display: flex; align-items: baseline; gap: 0.7rem; }
+.addon-head h3 { font-size: 18px; margin: 0; }
+.addon-price { font-size: 18px; font-weight: 700; color: var(--ink); }
+.addon-price em { font-style: normal; font-size: 13px; font-weight: 400; color: var(--dim); }
+.addon-text p { margin-top: 0.5rem; max-width: 62ch; color: var(--dim); font-weight: 300; line-height: 1.5; font-size: 14px; }
+.addon-features {
+  list-style: none; margin: 0.7rem 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem;
+}
+.addon-features li { font-size: 12.5px; color: var(--dim); position: relative; padding-left: 0.9rem; }
+.addon-features li::before { content: '·'; position: absolute; left: 0; color: var(--cyan); }
+.addon-btn {
+  flex-shrink: 0;
+  padding: 0.8rem 1.5rem; border-radius: 999px; white-space: nowrap;
+  font-size: 14px; font-weight: 600; text-decoration: none; color: var(--ink);
+  border: 1px solid rgba(244, 246, 255, 0.22);
+  transition: transform 0.3s, border-color 0.3s;
+}
+.addon-btn:hover { transform: translateY(-2px); border-color: var(--cyan); }
+
+/* Final CTA */
+.market.final { text-align: center; padding-bottom: 5rem; }
+.market.final h2 { margin-left: auto; margin-right: auto; }
+.final-actions {
+  margin-top: 2.4rem; display: flex; gap: 1.4rem; align-items: center; justify-content: center;
+  flex-wrap: wrap;
+}
+.final-actions .cta { margin-top: 0; }
+.ghost { color: var(--dim); text-decoration: none; font-size: 15px; border-bottom: 1px solid rgba(180,196,255,0.25); padding-bottom: 2px; }
+.ghost:hover { color: var(--ink); }
+
+/* Demos gallery */
+.demo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem; margin-top: 2.4rem; }
+.demo-card {
+  display: flex; flex-direction: column;
+  border-radius: 18px; overflow: hidden; text-decoration: none; color: var(--ink);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(180, 196, 255, 0.1);
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.demo-card:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 26px 60px -30px var(--cyan); }
+.demo-card.active { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+.demo-swatch { height: 96px; filter: saturate(1.1); }
+.demo-meta { padding: 1.5rem 1.6rem 1.7rem; }
+.demo-meta h3 { font-size: 18px; margin-bottom: 0.5rem; }
+.demo-meta p { color: var(--dim); font-weight: 300; line-height: 1.5; font-size: 14.5px; }
+.demo-go {
+  display: inline-block; margin-top: 1rem;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--cyan);
+}
+.demo-back {
+  display: inline-block; margin-top: 2rem;
+  color: var(--dim); text-decoration: none; font-size: 14px;
+  border-bottom: 1px solid rgba(180, 196, 255, 0.25); padding-bottom: 2px;
+}
+.demo-back:hover { color: var(--ink); }
+
+@media (max-width: 860px) {
+  .features-grid, .steps, .pricing, .demo-grid { grid-template-columns: 1fr; }
+  .market { padding: 5rem 7vw; }
+  .tier-blurb { min-height: 0; }
 }

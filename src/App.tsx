@@ -1,45 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { createUniverse } from './three/universe';
+import { SITE } from './product.config';
 
-const PANELS = [
-  {
-    align: 'center',
-    kicker: 'A hundred thousand points of light',
-    title: <h1>FLOWLY</h1>,
-    lead: 'A living cloud of 120,000 luminous particles. Scroll, and watch the cosmos rearrange itself before your eyes.',
-  },
-  {
-    align: 'left',
-    kicker: 'Form follows motion',
-    title: <h2>Matter remembers every shape it has ever been.</h2>,
-    lead: 'A spiral galaxy collapses into a single word — the same particles, flowing between forms, never breaking.',
-  },
-  {
-    align: 'right',
-    kicker: 'Whole worlds, one breath apart',
-    title: <h2>A perfect sphere, woven from drifting dust.</h2>,
-    lead: 'Curl-noise turbulence keeps every point alive — breathing, shimmering, refusing to sit still.',
-  },
-  {
-    align: 'left',
-    kicker: 'It can become anything',
-    title: <h2>Even a real 3D object, rebuilt entirely from light.</h2>,
-    lead: 'This shape is sampled from an actual glTF model — 120,000 particles snapping onto its surface in real time.',
-  },
-  {
-    align: 'right',
-    kicker: 'The code of everything',
-    title: <h2>Then it spirals into the helix of life itself.</h2>,
-    lead: 'Two intertwined strands, rendered on the GPU and bathed in real-time bloom.',
-  },
-  {
-    align: 'center',
-    kicker: 'Then it lets go',
-    title: <h2>And scatters back into the infinite.</h2>,
-    lead: 'You just watched physics put on a show. Imagine what it could do for your story.',
-    cta: true,
-  },
-] as const;
+// `?demo=<id>` re-skins the particle hero with a gallery preset; default = the
+// motewave self-demo. Read once at load so the WebGL scene initializes cleanly.
+const params = new URLSearchParams(window.location.search);
+const ACTIVE_DEMO = SITE.demos.find((d) => d.id === params.get('demo')) ?? SITE.demo;
+const ACTIVE_ID = 'id' in ACTIVE_DEMO ? ACTIVE_DEMO.id : null;
+const PANELS = ACTIVE_DEMO.panels;
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,10 +16,18 @@ export default function App() {
   const hintRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // Brand accent → CSS custom properties (headline gradient, rail, CTAs, cards).
+  useEffect(() => {
+    const root = document.documentElement.style;
+    root.setProperty('--cyan', ACTIVE_DEMO.accent.a);
+    root.setProperty('--violet', ACTIVE_DEMO.accent.b);
+    root.setProperty('--magenta', ACTIVE_DEMO.accent.c);
+  }, []);
+
   useEffect(() => {
     if (!canvasRef.current) return;
     const universe = createUniverse(canvasRef.current, {
-      modelUrl: `${import.meta.env.BASE_URL}models/helmet.glb`,
+      demo: ACTIVE_DEMO,
       onReady: () => setLoaded(true),
     });
     return () => universe.dispose();
@@ -72,11 +48,20 @@ export default function App() {
         el.style.transform = `translateY(${(1 - o) * 30}px)`;
       });
 
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = max > 0 ? window.scrollY / max : 0;
-      const active = Math.round(progress * (PANELS.length - 1));
+      // Rail dots track the active demo beat (scoped to the hero act).
+      const N = PANELS.length;
+      const actScroll = Math.max(1, (N - 1) * vh);
+      const progress = Math.min(1, window.scrollY / actScroll);
+      const active = Math.round(progress * (N - 1));
       dotRefs.current.forEach((d, i) => d?.classList.toggle('on', i === active));
       if (hintRef.current) hintRef.current.style.opacity = window.scrollY > 80 ? '0' : '1';
+
+      // Fade the particle canvas down as the sales page scrolls in, so the copy
+      // stays legible — a faint shimmer remains as ambiance.
+      const fadeStart = (N - 0.5) * vh;
+      const fadeEnd = N * vh;
+      const f = Math.min(1, Math.max(0, (window.scrollY - fadeStart) / (fadeEnd - fadeStart)));
+      if (canvasRef.current) canvasRef.current.style.opacity = String(1 - f * 0.88);
     };
     const onScroll = () => {
       cancelAnimationFrame(raf);
@@ -96,7 +81,7 @@ export default function App() {
     <>
       <div id="loader" className={loaded ? 'gone' : ''}>
         <div className="ring" />
-        <div className="txt">Igniting the universe</div>
+        <div className="txt">Assembling {SITE.brand}</div>
       </div>
 
       <canvas id="scene" ref={canvasRef} />
@@ -104,8 +89,8 @@ export default function App() {
       <div id="grain" />
 
       <header id="topbar">
-        <div className="brand">FLOWLY</div>
-        <div className="meta">EST. ∞ · A PARTICLE UNIVERSE</div>
+        <div className="brand">{SITE.brand}</div>
+        <a className="buy" href="#pricing">See pricing</a>
       </header>
 
       <nav id="rail" aria-hidden="true">
@@ -114,23 +99,14 @@ export default function App() {
         ))}
       </nav>
 
+      {/* ── Zone A: the particle hero act ── */}
       <main id="scroll">
         {PANELS.map((p, i) => (
           <section key={i} className={`panel ${p.align}`}>
             <div className="reveal" ref={(el) => { revealRefs.current[i] = el; }}>
               <div className="kicker">{p.kicker}</div>
-              {p.title}
+              {p.hero ? <h1>{p.title}</h1> : <h2>{p.title}</h2>}
               <p className="lead">{p.lead}</p>
-              {'cta' in p && p.cta && (
-                <div>
-                  <a className="cta" href="#" onClick={(e) => e.preventDefault()}>
-                    Begin your universe
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </a>
-                </div>
-              )}
             </div>
           </section>
         ))}
@@ -141,9 +117,117 @@ export default function App() {
         <span className="line" />
       </div>
 
-      <footer id="credit">
-        Model: “Battle Damaged Sci-fi Helmet” by ctxr · CC-BY 4.0 · Built with Three.js
-      </footer>
+      {/* ── Zone B: the conventional sales page ── */}
+      <div id="sales">
+        <section className="market pitch">
+          <div className="kicker">{SITE.pitch.kicker}</div>
+          <h2>{SITE.pitch.title}</h2>
+          <p className="lead">{SITE.pitch.lead}</p>
+        </section>
+
+        <section className="market demos" id="demos">
+          <div className="kicker">See what's possible</div>
+          <h2>One engine. Endless launches.</h2>
+          <p className="lead">Tap a demo to watch the hero at the top transform — your launch could look like any of these, built around your brand.</p>
+          <div className="demo-grid">
+            {SITE.demos.map((d) => (
+              <a key={d.id} className={`demo-card${ACTIVE_ID === d.id ? ' active' : ''}`} href={`?demo=${d.id}`}>
+                <div className="demo-swatch" style={{ background: `linear-gradient(120deg, ${d.accent.a}, ${d.accent.b}, ${d.accent.c})` }} />
+                <div className="demo-meta">
+                  <h3>{d.label}</h3>
+                  <p>{d.blurb}</p>
+                  <span className="demo-go">{ACTIVE_ID === d.id ? 'Now showing ↑' : 'Preview live →'}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+          {ACTIVE_ID && (
+            <a className="demo-back" href={import.meta.env.BASE_URL}>← Back to the motewave demo</a>
+          )}
+        </section>
+
+        <section className="market">
+          <div className="features-grid">
+            {SITE.features.map((f, i) => (
+              <div className="feature" key={i}>
+                <h3>{f.title}</h3>
+                <p>{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="market">
+          <div className="kicker">How it works</div>
+          <div className="steps">
+            {SITE.steps.map((s) => (
+              <div className="step" key={s.n}>
+                <div className="step-n">{s.n}</div>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="market" id="pricing">
+          <div className="kicker">Pricing</div>
+          <h2>Pick a package.</h2>
+          <div className="pricing">
+            {SITE.packages.map((pkg) => (
+              <div className={`tier${pkg.featured ? ' featured' : ''}`} key={pkg.name}>
+                {pkg.featured && <div className="badge">Most popular</div>}
+                <div className="tier-name">{pkg.name}</div>
+                <div className="tier-price">{pkg.price}</div>
+                <div className="tier-send"><span>You send</span>{pkg.youSend}</div>
+                <p className="tier-blurb">{pkg.blurb}</p>
+                <ul>
+                  {pkg.features.map((feat, j) => (
+                    <li key={j}>{feat}</li>
+                  ))}
+                </ul>
+                <a className="buy-btn" href={pkg.stripeUrl}>
+                  Get {pkg.name}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <div className="addon">
+            <div className="addon-text">
+              <div className="addon-eyebrow">{SITE.hostingAddon.eyebrow}</div>
+              <div className="addon-head">
+                <h3>{SITE.hostingAddon.name}</h3>
+                <span className="addon-price">{SITE.hostingAddon.price}<em>{SITE.hostingAddon.period}</em></span>
+              </div>
+              <p>{SITE.hostingAddon.blurb}</p>
+              <ul className="addon-features">
+                {SITE.hostingAddon.features.map((f, i) => <li key={i}>{f}</li>)}
+              </ul>
+            </div>
+            <a className="addon-btn" href={SITE.hostingAddon.stripeUrl}>Add hosting</a>
+          </div>
+        </section>
+
+        <section className="market final">
+          <h2>{SITE.finalCta.title}</h2>
+          <p className="lead">{SITE.finalCta.lead}</p>
+          <div className="final-actions">
+            <a className="cta" href="#pricing">
+              See packages
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+            <a className="ghost" href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>
+          </div>
+        </section>
+
+        <footer id="credit">{SITE.demo.modelAttribution} · {SITE.brand}</footer>
+      </div>
     </>
   );
 }
