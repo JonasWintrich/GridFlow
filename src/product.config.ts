@@ -51,7 +51,16 @@ export interface Package {
   features: string[];
   /** Stripe Payment Link URL — a plain href, no backend. '#' = not wired yet. */
   stripeUrl: string;
+  /** Demo preset id (see `demos`) this tier links to as a live example. */
+  exampleDemoId: string;
   featured?: boolean;
+}
+
+/** A simple legal document rendered at a hash route (#terms / #privacy / #refund). */
+export interface LegalDoc {
+  title: string;
+  updated: string;
+  sections: { h: string; p: string }[];
 }
 
 const BASE = import.meta.env.BASE_URL;
@@ -203,6 +212,7 @@ export const SITE = {
       blurb: 'A one-page particle hero that assembles your brand in light.',
       features: ['One-page particle hero', 'Up to 3 scroll beats', 'Mobile-tuned', 'Full source code — deploy free anywhere', '~3-day delivery · 1 revision'],
       stripeUrl: '#', // paste your Stripe Payment Link
+      exampleDemoId: 'saas',
     },
     {
       name: 'Signature',
@@ -211,6 +221,7 @@ export const SITE = {
       blurb: 'A multi-beat scroll reveal built around your product.',
       features: ['Multi-beat scroll reveal', 'Custom copy + your brand colors', 'Landing sections (features + CTA)', 'Full source code — deploy free anywhere', '~5-day delivery · 2 revisions'],
       stripeUrl: '#',
+      exampleDemoId: 'fashion',
       featured: true,
     },
     {
@@ -220,6 +231,7 @@ export const SITE = {
       blurb: 'Your product sampled into 120,000 particles — the full reveal.',
       features: ['Full 3D product reveal, rotating', 'Complete custom microsite + copy', 'Your brand palette', 'Priority delivery', 'Full source code — deploy free anywhere', '~7-day delivery · 3 revisions'],
       stripeUrl: '#',
+      exampleDemoId: 'product',
     },
   ] as Package[],
 
@@ -238,4 +250,50 @@ export const SITE = {
     title: 'Ready to launch in light?',
     lead: 'Pick a package to get started, or email us with your product and we’ll scope it.',
   },
+
+  // ── Tally forms (file-upload intake + contact). Paste your form URLs here. ──
+  // Set each Stripe Payment Link's post-payment redirect to .../#intake.
+  forms: {
+    intakeUrl: 'https://tally.so/r/XXXXXX', // intake form WITH file upload (logo/photos/3D)
+    contactUrl: 'https://tally.so/r/YYYYYY', // simple contact / scoping form
+  },
+
+  // ── Legal pages (#terms / #privacy / #refund). PLACEHOLDER copy — have a
+  //    professional review before relying on it. ──
+  legal: {
+    terms: {
+      title: 'Terms of Service',
+      updated: '2026',
+      sections: [
+        { h: 'The service', p: 'motewave designs and builds bespoke particle-based launch web pages. Each package describes its scope, deliverables, delivery time, and number of revisions. Work begins once payment is received and you have supplied the required assets.' },
+        { h: 'Payment', p: 'Package fees are one-time and charged up front via Stripe. The optional hosting add-on is a recurring monthly subscription billed via Stripe until cancelled.' },
+        { h: 'Delivery & revisions', p: 'We deliver within the timeframe stated on your package, subject to receiving complete assets and timely feedback. Revisions are limited to the number stated on your tier.' },
+        { h: 'Ownership', p: 'On final payment, you own the delivered source code outright and may host, modify, and reuse it freely. Third-party assets you supply remain yours; open-source components keep their original licenses.' },
+        { h: 'Hosting add-on', p: 'If you subscribe to done-for-you hosting, we host your page and connect your domain. You may cancel anytime; on cancellation we provide your code so you can self-host.' },
+        { h: 'Liability', p: 'The service is provided “as is.” To the maximum extent permitted by law, motewave is not liable for indirect or consequential damages. Our total liability is limited to the fees you paid.' },
+        { h: 'Contact', p: 'Questions about these terms: hello@motewave.com.' },
+      ],
+    },
+    privacy: {
+      title: 'Privacy Policy',
+      updated: '2026',
+      sections: [
+        { h: 'What we collect', p: 'Information you submit through our forms (name, email, brand assets, project notes) and privacy-friendly, cookie-less analytics about page visits.' },
+        { h: 'Processors', p: 'We use Stripe (payments), Tally (forms), and Cloudflare (hosting + Web Analytics). Your data is processed by these providers under their own privacy policies.' },
+        { h: 'How we use it', p: 'Solely to deliver your project, respond to enquiries, and improve the site. We do not sell your data or share it beyond the processors above.' },
+        { h: 'Cookies', p: 'We use Cloudflare Web Analytics, which does not use cookies or fingerprinting. Stripe/Tally may set cookies during checkout or form submission.' },
+        { h: 'Your rights & contact', p: 'Request access to or deletion of your data anytime at hello@motewave.com.' },
+      ],
+    },
+    refund: {
+      title: 'Refund & Cancellation',
+      updated: '2026',
+      sections: [
+        { h: 'Custom work', p: 'Because each page is custom-built, fees become non-refundable once design work has begun. Before work starts, you may request a full refund.' },
+        { h: 'Not satisfied', p: 'If the delivered page materially differs from your package scope, we will revise it within your tier’s revision limit at no charge.' },
+        { h: 'Hosting subscription', p: 'The monthly hosting add-on can be cancelled anytime and stops at the end of the current billing period; the current month is not pro-rated. Your source code remains yours.' },
+        { h: 'Contact', p: 'Refund or cancellation requests: hello@motewave.com.' },
+      ],
+    },
+  } satisfies Record<'terms' | 'privacy' | 'refund', LegalDoc>,
 };

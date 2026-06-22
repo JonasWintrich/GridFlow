@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { createUniverse } from './three/universe';
 import { SITE } from './product.config';
+import { LegalPage, FormPage } from './Pages';
+
+const SUBPAGES = ['terms', 'privacy', 'refund', 'intake', 'contact'] as const;
+type Subpage = (typeof SUBPAGES)[number];
+const readRoute = (): Subpage | null => {
+  const h = window.location.hash.replace('#', '');
+  return (SUBPAGES as readonly string[]).includes(h) ? (h as Subpage) : null;
+};
 
 // `?demo=<id>` re-skins the particle hero with a gallery preset; default = the
 // motewave self-demo. Read once at load so the WebGL scene initializes cleanly.
@@ -15,6 +23,14 @@ export default function App() {
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const hintRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
+  const [route, setRoute] = useState<Subpage | null>(readRoute());
+
+  // Hash-based sub-page routing (#terms/#privacy/#refund/#intake/#contact).
+  useEffect(() => {
+    const onHash = () => { setRoute(readRoute()); window.scrollTo(0, 0); };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   // Brand accent → CSS custom properties (headline gradient, rail, CTAs, cards).
   useEffect(() => {
@@ -24,16 +40,18 @@ export default function App() {
     root.setProperty('--magenta', ACTIVE_DEMO.accent.c);
   }, []);
 
+  // Particle universe lives only on the main route; re-init when returning to it.
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (route || !canvasRef.current) return;
     const universe = createUniverse(canvasRef.current, {
       demo: ACTIVE_DEMO,
       onReady: () => setLoaded(true),
     });
     return () => universe.dispose();
-  }, []);
+  }, [route]);
 
   useEffect(() => {
+    if (route) return;
     let raf = 0;
     const update = () => {
       const vh = window.innerHeight;
@@ -75,7 +93,16 @@ export default function App() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, []);
+  }, [route]);
+
+  // ── hash sub-pages (rendered instead of the main site) ──
+  if (route === 'terms') return <LegalPage doc={SITE.legal.terms} />;
+  if (route === 'privacy') return <LegalPage doc={SITE.legal.privacy} />;
+  if (route === 'refund') return <LegalPage doc={SITE.legal.refund} />;
+  if (route === 'intake')
+    return <FormPage title="Send us your assets" lead="Thanks for your order! Upload your logo, photos, or 3D model and tell us about your brand — we’ll take it from here." src={SITE.forms.intakeUrl} />;
+  if (route === 'contact')
+    return <FormPage title="Let’s talk" lead="Tell us about your product and what you have in mind. We’ll reply with scope and next steps." src={SITE.forms.contactUrl} />;
 
   return (
     <>
@@ -192,6 +219,7 @@ export default function App() {
                     <path d="M5 12h14M13 6l6 6-6 6" />
                   </svg>
                 </a>
+                <a className="tier-example" href={`?demo=${pkg.exampleDemoId}`}>See an example →</a>
               </div>
             ))}
           </div>
@@ -222,11 +250,20 @@ export default function App() {
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </a>
-            <a className="ghost" href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>
+            <a className="ghost" href="#contact">Contact us</a>
           </div>
         </section>
 
-        <footer id="credit">{SITE.demo.modelAttribution} · {SITE.brand}</footer>
+        <footer id="credit">
+          <div className="foot-links">
+            <a href="#contact">Contact</a>
+            <a href="#intake">Already purchased? Send your assets →</a>
+            <a href="#terms">Terms</a>
+            <a href="#privacy">Privacy</a>
+            <a href="#refund">Refunds</a>
+          </div>
+          <div className="foot-fine">{SITE.demo.modelAttribution} · {SITE.brand}</div>
+        </footer>
       </div>
     </>
   );
