@@ -93,9 +93,9 @@ export function createUniverse(canvas: HTMLCanvasElement, opts: Options): Univer
   composer.addPass(new RenderPass(scene, camera));
   const bloom = new UnrealBloomPass(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
-    isMobile ? 0.4 : 0.55, // strength
+    isMobile ? 0.3 : 0.4, // strength — restrained so product silhouettes survive the glow
     0.5, // radius
-    0.28, // threshold — only the brightest cores bloom, keeping space deep-black
+    0.42, // threshold — only the brightest cores bloom, keeping shapes legible
   );
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
@@ -171,7 +171,7 @@ export function createUniverse(canvas: HTMLCanvasElement, opts: Options): Univer
     // Calm the curl-noise drift near product beats so the model's silhouette stays
     // legible; let it breathe fully on the abstract forms (brand text, sphere).
     const onModel = modelIndices.has(seg) || modelIndices.has(seg + 1);
-    const driftTarget = onModel ? 0.55 : 1.7;
+    const driftTarget = onModel ? 0.33 : 1.7;
     particles.uniforms.uDrift.value += (driftTarget - particles.uniforms.uDrift.value) * Math.min(1, dt * 3);
 
     // camera framing interpolated along the journey

@@ -48,9 +48,10 @@ Cloudflare → your domain → **Email → Email Routing** → forward `hello@mo
 - [ ] Replace the 4 Stripe URLs + 2 Tally URLs above.
 - [ ] Paste the Cloudflare Analytics token.
 - [ ] Add a real `public/og.png` (1200×630) for social link previews.
-- [ ] Review the **placeholder legal text** in `SITE.legal` (`src/product.config.ts`) — have it checked by a professional.
-- [ ] Swap `SITE.contactEmail` if not `hello@motewave.com`.
-- [ ] (Recommended) Replace the 10.6 MB demo model `public/models/aura-one.glb` with a lighter one to speed first load.
+- [ ] Review the **placeholder legal text** in `SITE.legal` (`src/product.config.ts`) — incl. the German **Impressum** (fill in your real name/address; legally required).
+- [ ] Personalize the **`SITE.about`** line + LinkedIn URL.
+- [ ] Swap `SITE.contactEmail` to `hello@motewave.com` once Email Routing forwards (currently your Gmail).
+- [ ] (Optional) The hero loads `public/models/car.glb` (~12 MB). Swapping for a lighter `.glb` speeds first paint. Demo models (`sneaker.glb`, `camera.glb`) load only on `?demo=`.
 
 ## Where everything lives
 

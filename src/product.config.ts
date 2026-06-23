@@ -24,6 +24,8 @@ export interface Demo {
   /** Optional product model; omit for a purely procedural (logo/shape) demo. */
   modelUrl?: string;
   modelSize: number;
+  /** Credit for this demo's model (CC attribution); shown in the footer. */
+  modelAttribution?: string;
   accent: { a: string; b: string; c: string };
   panels: Panel[];
 }
@@ -75,9 +77,9 @@ export const SITE = {
 
   // ── the particle "demo reel": motewave brand → a product assembling & turning ──
   demo: {
-    modelUrl: `${BASE}models/aura-one.glb`,
-    modelAttribution: '“BoomBox” by Microsoft · CC0 · Demo product',
-    modelSize: 56,
+    modelUrl: `${BASE}models/car.glb`,
+    modelAttribution: '“Car Concept” by Eric Chadwick · CC-BY 4.0 · demo product',
+    modelSize: 70,
     // Warm amber → rose → violet brand accent (flows through palette, headings, CTAs).
     accent: { a: '#f5b14c', b: '#fb7185', c: '#a855f7' },
     panels: [
@@ -96,16 +98,16 @@ export const SITE = {
         kicker: 'Watch',
         title: 'Your product, drawn from 120,000 points of light.',
         lead: 'A real 3D model of the product, sampled onto the surface in real time — rendered live on the GPU, not a video.',
-        view: { kind: 'model', yaw: 0 },
-        camZ: 56,
-        tiltX: 0.14,
+        view: { kind: 'model', yaw: -0.9 },
+        camZ: 58,
+        tiltX: 0.12,
       },
       {
         align: 'right',
         kicker: 'It moves',
         title: 'It dissolves, turns, and re-forms — never breaking.',
         lead: 'Every scroll choreographs the cloud. The same particles flow between angles and shapes, alive with curl-noise drift and bloom.',
-        view: { kind: 'model', yaw: -0.95 },
+        view: { kind: 'model', yaw: 0.5 },
         camZ: 58,
         tiltX: 0.1,
       },
@@ -113,10 +115,19 @@ export const SITE = {
         align: 'center',
         kicker: 'This is just a demo',
         title: 'Picture your product here.',
-        lead: 'A speaker, a sneaker, a bottle, your logo — anything with a shape. Keep scrolling to see how it works and what it costs.',
-        view: { kind: 'model', yaw: 0.55 },
-        camZ: 54,
+        lead: 'A car, a sneaker, a bottle, your logo — anything with a shape.',
+        view: { kind: 'model', yaw: -0.55 },
+        camZ: 56,
         tiltX: 0.12,
+      },
+      {
+        align: 'center',
+        kicker: 'Then it lets go',
+        title: 'And blooms into a universe of its own.',
+        lead: 'The same 120,000 points that built your product spiral out into a living galaxy — physics, putting on a show. Keep scrolling.',
+        view: { kind: 'galaxy' },
+        camZ: 84,
+        tiltX: 0.7,
       },
     ] as Panel[],
   },
@@ -161,16 +172,31 @@ export const SITE = {
       ],
     },
     {
-      id: 'product',
-      label: 'Product reveal (3D)',
-      blurb: 'Your actual product, sampled into particles and rotating in light.',
-      modelUrl: `${BASE}models/aura-one.glb`,
-      modelSize: 56,
-      accent: { a: '#fbbf24', b: '#fb923c', c: '#f472b6' },
+      id: 'sneaker',
+      label: 'Sneaker / fashion drop',
+      blurb: 'A real sneaker, sampled into particles and turning in mid-air.',
+      modelUrl: `${BASE}models/sneaker.glb`,
+      modelAttribution: 'Shoe by Shopify · CC-BY 4.0',
+      modelSize: 46,
+      accent: { a: '#fbbf24', b: '#fb7185', c: '#a855f7' },
       panels: [
-        { align: 'center', hero: true, kicker: 'Product reveal', title: 'AURA', lead: 'Your product, rebuilt entirely from light.', view: { kind: 'brandText', text: 'AURA' }, camZ: 60, tiltX: 0 },
-        { align: 'left', kicker: 'Form', title: 'Sampled onto a real 3D model.', lead: '120,000 particles snap onto its surface in real time.', view: { kind: 'model', yaw: 0 }, camZ: 56, tiltX: 0.14 },
-        { align: 'right', kicker: 'Turn', title: 'Dissolving and re-forming as it turns.', lead: 'The same particles flow between every angle, never breaking.', view: { kind: 'model', yaw: -0.95 }, camZ: 58, tiltX: 0.1 },
+        { align: 'center', hero: true, kicker: 'Sneaker / fashion drop', title: 'STRIDE', lead: 'Your product, rebuilt entirely from light.', view: { kind: 'brandText', text: 'STRIDE' }, camZ: 60, tiltX: 0 },
+        { align: 'left', kicker: 'Form', title: 'A real 3D model, drawn in particles.', lead: '120,000 points snap onto the surface in real time.', view: { kind: 'model', yaw: -0.4 }, camZ: 52, tiltX: 0.12 },
+        { align: 'right', kicker: 'Turn', title: 'It dissolves and re-forms as it turns.', lead: 'The same particles flow between every angle, never breaking.', view: { kind: 'model', yaw: 0.7 }, camZ: 54, tiltX: 0.1 },
+      ],
+    },
+    {
+      id: 'camera',
+      label: 'Gadget / hardware launch',
+      blurb: 'A camera assembling from a cloud of light, rotating to every angle.',
+      modelUrl: `${BASE}models/camera.glb`,
+      modelAttribution: '“Antique Camera” by Maximilian Kamps · CC0',
+      modelSize: 50,
+      accent: { a: '#6366f1', b: '#8b5cf6', c: '#d946ef' },
+      panels: [
+        { align: 'center', hero: true, kicker: 'Gadget / hardware launch', title: 'APERTURE', lead: 'Your device, assembled from 120,000 points of light.', view: { kind: 'brandText', text: 'APERTURE' }, camZ: 62, tiltX: 0 },
+        { align: 'left', kicker: 'Form', title: 'Sampled onto a real 3D model.', lead: 'Rendered live on the GPU — crisp at any size, never a video.', view: { kind: 'model', yaw: -0.5 }, camZ: 56, tiltX: 0.12 },
+        { align: 'right', kicker: 'Turn', title: 'Dissolving and re-forming as it turns.', lead: 'One continuous body of light, flowing between angles.', view: { kind: 'model', yaw: 0.6 }, camZ: 58, tiltX: 0.1 },
       ],
     },
   ] as Demo[],
@@ -224,7 +250,7 @@ export const SITE = {
       blurb: 'A multi-beat scroll reveal built around your product.',
       features: ['Multi-beat scroll reveal', 'Custom copy + your brand colors', 'Landing sections (features + CTA)', 'Full source code — deploy free anywhere', '~5-day delivery · 2 revisions'],
       stripeUrl: '#',
-      exampleDemoId: 'fashion',
+      exampleDemoId: 'sneaker',
       featured: true,
     },
     {
@@ -234,7 +260,7 @@ export const SITE = {
       blurb: 'Your product sampled into 120,000 particles — the full reveal.',
       features: ['Full 3D product reveal, rotating', 'Complete custom microsite + copy', 'Your brand palette', 'Priority delivery', 'Full source code — deploy free anywhere', '~7-day delivery · 3 revisions'],
       stripeUrl: '#',
-      exampleDemoId: 'product',
+      exampleDemoId: 'camera',
     },
   ] as Package[],
 
@@ -298,5 +324,23 @@ export const SITE = {
         { h: 'Contact', p: `Refund or cancellation requests: ${CONTACT_EMAIL}.` },
       ],
     },
-  } satisfies Record<'terms' | 'privacy' | 'refund', LegalDoc>,
+    impressum: {
+      title: 'Impressum',
+      updated: '2026',
+      sections: [
+        { h: 'Angaben gemäß § 5 DDG', p: '[Dein Name / Firmenname]\n[Straße und Hausnummer]\n[PLZ Ort]\n[Land]' },
+        { h: 'Kontakt', p: `E-Mail: ${CONTACT_EMAIL}\nTelefon: [optional]` },
+        { h: 'Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV', p: '[Dein Name]\n[Anschrift wie oben]' },
+        { h: 'Umsatzsteuer-ID', p: 'Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: [falls vorhanden, sonst entfernen]' },
+        { h: 'Hinweis', p: 'Platzhalter — bitte vor dem Launch mit deinen echten Angaben füllen und rechtlich prüfen lassen. Ein Impressum ist für geschäftliche Websites in Deutschland gesetzlich vorgeschrieben.' },
+      ],
+    },
+  } satisfies Record<'terms' | 'privacy' | 'refund' | 'impressum', LegalDoc>,
+
+  // Short "who's behind this" trust line (edit freely; pull your real LinkedIn headline).
+  about: {
+    line: 'Built by Jonas Wintrich — an independent developer crafting motion-driven, particle-powered web experiences.',
+    linkLabel: 'Connect on LinkedIn',
+    url: 'https://www.linkedin.com/in/jonas-wintrich-a31bb61ba/',
+  },
 };

@@ -3,7 +3,7 @@ import { createUniverse } from './three/universe';
 import { SITE } from './product.config';
 import { LegalPage, FormPage } from './Pages';
 
-const SUBPAGES = ['terms', 'privacy', 'refund', 'intake', 'contact'] as const;
+const SUBPAGES = ['terms', 'privacy', 'refund', 'impressum', 'intake', 'contact'] as const;
 type Subpage = (typeof SUBPAGES)[number];
 const readRoute = (): Subpage | null => {
   const h = window.location.hash.replace('#', '');
@@ -16,6 +16,7 @@ const params = new URLSearchParams(window.location.search);
 const ACTIVE_DEMO = SITE.demos.find((d) => d.id === params.get('demo')) ?? SITE.demo;
 const ACTIVE_ID = 'id' in ACTIVE_DEMO ? ACTIVE_DEMO.id : null;
 const PANELS = ACTIVE_DEMO.panels;
+const CREDIT = ACTIVE_DEMO.modelAttribution ?? SITE.demo.modelAttribution;
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -99,6 +100,7 @@ export default function App() {
   if (route === 'terms') return <LegalPage doc={SITE.legal.terms} />;
   if (route === 'privacy') return <LegalPage doc={SITE.legal.privacy} />;
   if (route === 'refund') return <LegalPage doc={SITE.legal.refund} />;
+  if (route === 'impressum') return <LegalPage doc={SITE.legal.impressum} />;
   if (route === 'intake')
     return <FormPage title="Send us your assets" lead="Thanks for your order! Upload your logo, photos, or 3D model and tell us about your brand — we’ll take it from here." src={SITE.forms.intakeUrl} fallbackNote="Email your logo, photos, or 3D model and a few notes about your brand, and we’ll get started." mailtoSubject="My motewave order — assets" />;
   if (route === 'contact')
@@ -254,6 +256,11 @@ export default function App() {
           </div>
         </section>
 
+        <div className="about">
+          <p>{SITE.about.line}</p>
+          <a href={SITE.about.url} target="_blank" rel="noopener noreferrer">{SITE.about.linkLabel} →</a>
+        </div>
+
         <footer id="credit">
           <div className="foot-links">
             <a href="#contact">Contact</a>
@@ -261,8 +268,9 @@ export default function App() {
             <a href="#terms">Terms</a>
             <a href="#privacy">Privacy</a>
             <a href="#refund">Refunds</a>
+            <a href="#impressum">Impressum</a>
           </div>
-          <div className="foot-fine">{SITE.demo.modelAttribution} · {SITE.brand}</div>
+          <div className="foot-fine">{CREDIT} · {SITE.brand}</div>
         </footer>
       </div>
     </>
