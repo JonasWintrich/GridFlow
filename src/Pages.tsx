@@ -26,10 +26,6 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
       <article className="legal">
         <h1>{doc.title}</h1>
         <p className="legal-updated">Last updated {doc.updated}</p>
-        <p className="legal-disclaimer">
-          This is a starting template, not legal advice — have it reviewed by a professional
-          before you rely on it.
-        </p>
         {doc.sections.map((s, i) => (
           <section key={i}>
             <h2>{s.h}</h2>

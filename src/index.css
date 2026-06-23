@@ -441,13 +441,7 @@ h2 {
 .subpage-foot a:hover { color: var(--ink); }
 
 .legal h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 700; letter-spacing: -0.02em; }
-.legal-updated { color: var(--dim); font-size: 13px; margin-top: 0.6rem; }
-.legal-disclaimer {
-  margin: 1.6rem 0 2.4rem; padding: 1rem 1.2rem; border-radius: 12px;
-  font-size: 13.5px; color: var(--dim); line-height: 1.5;
-  background: color-mix(in srgb, var(--cyan) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--cyan) 22%, transparent);
-}
+.legal-updated { color: var(--dim); font-size: 13px; margin-top: 0.6rem; margin-bottom: 1rem; }
 .legal section { margin-top: 1.8rem; }
 .legal h2 { font-size: 19px; font-weight: 600; margin-bottom: 0.5rem; }
 .legal p { color: var(--dim); font-weight: 300; line-height: 1.6; font-size: 15px; }
