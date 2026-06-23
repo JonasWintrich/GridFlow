@@ -100,9 +100,9 @@ export default function App() {
   if (route === 'privacy') return <LegalPage doc={SITE.legal.privacy} />;
   if (route === 'refund') return <LegalPage doc={SITE.legal.refund} />;
   if (route === 'intake')
-    return <FormPage title="Send us your assets" lead="Thanks for your order! Upload your logo, photos, or 3D model and tell us about your brand — we’ll take it from here." src={SITE.forms.intakeUrl} />;
+    return <FormPage title="Send us your assets" lead="Thanks for your order! Upload your logo, photos, or 3D model and tell us about your brand — we’ll take it from here." src={SITE.forms.intakeUrl} fallbackNote="Email your logo, photos, or 3D model and a few notes about your brand, and we’ll get started." mailtoSubject="My motewave order — assets" />;
   if (route === 'contact')
-    return <FormPage title="Let’s talk" lead="Tell us about your product and what you have in mind. We’ll reply with scope and next steps." src={SITE.forms.contactUrl} />;
+    return <FormPage title="Let’s talk" lead="Tell us about your product and what you have in mind. We’ll reply with scope and next steps." src={SITE.forms.contactUrl} fallbackNote="Tell us about your product and we’ll reply with scope and next steps." mailtoSubject="motewave enquiry" />;
 
   return (
     <>

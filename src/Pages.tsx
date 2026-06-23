@@ -14,7 +14,7 @@ function SubpageShell({ children }: { children: React.ReactNode }) {
       <main className="subpage-body">{children}</main>
       <footer className="subpage-foot">
         <a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#refund">Refunds</a>
-        <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>
+        <a href={`mailto:${SITE.contactEmail}`}>Email us</a>
       </footer>
     </div>
   );
@@ -41,14 +41,29 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
   );
 }
 
-export function FormPage({ title, lead, src }: { title: string; lead: string; src: string }) {
+// A Tally URL that still contains the setup placeholder isn't connected yet.
+const isPlaceholder = (src: string) => !/^https?:\/\//.test(src) || /XXXXXX|YYYYYY/.test(src);
+
+export function FormPage({
+  title, lead, src, fallbackNote, mailtoSubject,
+}: {
+  title: string; lead: string; src: string; fallbackNote: string; mailtoSubject: string;
+}) {
+  const mailto = `mailto:${SITE.contactEmail}?subject=${encodeURIComponent(mailtoSubject)}`;
   return (
     <SubpageShell>
       <div className="form-intro">
         <h1>{title}</h1>
         <p>{lead}</p>
       </div>
-      <iframe className="embed" title={title} src={src} loading="lazy" />
+      {isPlaceholder(src) ? (
+        <div className="form-fallback">
+          <p>{fallbackNote}</p>
+          <a className="cta" href={mailto}>Email us</a>
+        </div>
+      ) : (
+        <iframe className="embed" title={title} src={src} loading="lazy" />
+      )}
     </SubpageShell>
   );
 }

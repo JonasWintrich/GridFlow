@@ -64,11 +64,14 @@ export interface LegalDoc {
 }
 
 const BASE = import.meta.env.BASE_URL;
+// Public contact address (mailto links, legal pages, contact-form fallback).
+// Swap to hello@motewave.com once that inbox/forwarding is set up.
+const CONTACT_EMAIL = 'jonas.wintrich@gmail.com';
 
 export const SITE = {
   brand: 'motewave',
   tagline: 'Launch pages made of light.',
-  contactEmail: 'hello@motewave.com', // placeholder — swap for your real address
+  contactEmail: CONTACT_EMAIL,
 
   // ── the particle "demo reel": motewave brand → a product assembling & turning ──
   demo: {
@@ -254,8 +257,8 @@ export const SITE = {
   // ── Tally forms (file-upload intake + contact). Paste your form URLs here. ──
   // Set each Stripe Payment Link's post-payment redirect to .../#intake.
   forms: {
-    intakeUrl: 'https://tally.so/r/XXXXXX', // intake form WITH file upload (logo/photos/3D)
-    contactUrl: 'https://tally.so/r/YYYYYY', // simple contact / scoping form
+    intakeUrl: 'https://tally.so/r/2EV5X9', // intake form WITH file upload (logo/photos/3D)
+    contactUrl: 'https://tally.so/r/2EV5X9', // simple contact / scoping form
   },
 
   // ── Legal pages (#terms / #privacy / #refund). PLACEHOLDER copy — have a
@@ -271,7 +274,7 @@ export const SITE = {
         { h: 'Ownership', p: 'On final payment, you own the delivered source code outright and may host, modify, and reuse it freely. Third-party assets you supply remain yours; open-source components keep their original licenses.' },
         { h: 'Hosting add-on', p: 'If you subscribe to done-for-you hosting, we host your page and connect your domain. You may cancel anytime; on cancellation we provide your code so you can self-host.' },
         { h: 'Liability', p: 'The service is provided “as is.” To the maximum extent permitted by law, motewave is not liable for indirect or consequential damages. Our total liability is limited to the fees you paid.' },
-        { h: 'Contact', p: 'Questions about these terms: hello@motewave.com.' },
+        { h: 'Contact', p: `Questions about these terms: ${CONTACT_EMAIL}.` },
       ],
     },
     privacy: {
@@ -282,7 +285,7 @@ export const SITE = {
         { h: 'Processors', p: 'We use Stripe (payments), Tally (forms), and Cloudflare (hosting + Web Analytics). Your data is processed by these providers under their own privacy policies.' },
         { h: 'How we use it', p: 'Solely to deliver your project, respond to enquiries, and improve the site. We do not sell your data or share it beyond the processors above.' },
         { h: 'Cookies', p: 'We use Cloudflare Web Analytics, which does not use cookies or fingerprinting. Stripe/Tally may set cookies during checkout or form submission.' },
-        { h: 'Your rights & contact', p: 'Request access to or deletion of your data anytime at hello@motewave.com.' },
+        { h: 'Your rights & contact', p: `Request access to or deletion of your data anytime at ${CONTACT_EMAIL}.` },
       ],
     },
     refund: {
@@ -292,7 +295,7 @@ export const SITE = {
         { h: 'Custom work', p: 'Because each page is custom-built, fees become non-refundable once design work has begun. Before work starts, you may request a full refund.' },
         { h: 'Not satisfied', p: 'If the delivered page materially differs from your package scope, we will revise it within your tier’s revision limit at no charge.' },
         { h: 'Hosting subscription', p: 'The monthly hosting add-on can be cancelled anytime and stops at the end of the current billing period; the current month is not pro-rated. Your source code remains yours.' },
-        { h: 'Contact', p: 'Refund or cancellation requests: hello@motewave.com.' },
+        { h: 'Contact', p: `Refund or cancellation requests: ${CONTACT_EMAIL}.` },
       ],
     },
   } satisfies Record<'terms' | 'privacy' | 'refund', LegalDoc>,

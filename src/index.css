@@ -455,6 +455,13 @@ h2 {
 .form-intro h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; }
 .form-intro p { color: var(--dim); font-weight: 300; line-height: 1.55; font-size: 16px; margin: 1rem 0 2rem; max-width: 52ch; }
 .embed { width: 100%; min-height: 70vh; border: 0; border-radius: 14px; background: rgba(255,255,255,0.02); }
+.form-fallback {
+  padding: 2.6rem 2rem; border-radius: 16px; text-align: center;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(180, 196, 255, 0.1);
+}
+.form-fallback p { color: var(--dim); font-weight: 300; line-height: 1.55; font-size: 15.5px; max-width: 46ch; margin: 0 auto 1.6rem; }
+.form-fallback .cta { margin-top: 0; }
 
 @media (max-width: 860px) {
   .features-grid, .steps, .pricing, .demo-grid { grid-template-columns: 1fr; }
